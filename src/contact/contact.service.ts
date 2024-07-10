@@ -1,14 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contact } from './entities/contact.entity';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ContactService {
   constructor(
     @InjectRepository(Contact) private contactRepository: Repository<Contact>,
+    @Inject('CONTACT_SERVICE') private client: ClientProxy,
   ) {}
   async create(createContactDto: CreateContactDto, request: Request) {
     const xForwardedFor = request.headers['x-forwarded-for'];
@@ -25,6 +27,11 @@ export class ContactService {
     const newContact = await this.contactRepository.save(contact);
     if (!newContact)
       throw new BadRequestException('Error al crear la solicitud');
+    if (createContactDto.subject) {
+      this.client.emit('createMailContact2', createContactDto);
+    }
+
+    this.client.emit('createMailContact', createContactDto);
     return {
       message: 'Solicitud creada correctamente',
     };

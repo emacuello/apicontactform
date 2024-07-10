@@ -19,6 +19,8 @@ export class Contact {
   @Column()
   message: string;
   @Column({ nullable: true })
+  subject: string;
+  @Column({ nullable: true })
   ip: string;
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
