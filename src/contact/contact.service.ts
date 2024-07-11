@@ -28,10 +28,10 @@ export class ContactService {
     if (!newContact)
       throw new BadRequestException('Error al crear la solicitud');
     if (createContactDto.subject) {
-      this.client.emit('createMailContact2', createContactDto);
+      this.client.emit({ cmd: 'createMailContact2' }, createContactDto);
     }
 
-    this.client.emit('createMailContact', createContactDto);
+    this.client.emit({ cmd: 'createMailContact' }, createContactDto);
     return {
       message: 'Solicitud creada correctamente',
     };
