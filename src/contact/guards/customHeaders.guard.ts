@@ -15,7 +15,7 @@ export class CustomHeaderGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     const CUSTOM_HEADER_KEY = process.env.CUSTOM_HEADER_KEY;
     const CUSTOM_HEADER_VALUE = process.env.CUSTOM_HEADER_VALUE;
-    console.log(request.headers);
+
     if (
       request.headers[CUSTOM_HEADER_KEY?.toLowerCase()] === CUSTOM_HEADER_VALUE
     ) {
