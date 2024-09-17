@@ -4,11 +4,7 @@ import { envs } from './env';
 
 const configDatabase = {
   type: 'postgres',
-  database: envs.DB_NAME,
-  host: envs.DB_HOST,
-  port: envs.DB_PORT,
-  username: envs.DB_USERNAME,
-  password: envs.DB_PASSWORD,
+  url: envs.DB_URL,
   entities: ['dist/**/*.entity{.ts,.js}'],
   // synchronize: true,
   logging: true,
