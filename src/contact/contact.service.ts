@@ -36,13 +36,11 @@ export class ContactService {
     this.logger.log('Emitiendo evento a Redis...');
     try {
       if (createContactDto.subject) {
-        await this.client
-          .emit({ cmd: 'createMailContact2' }, createContactDto)
-          .toPromise();
+        this.client.emit({ cmd: 'createMailContact2' }, createContactDto);
+        // .toPromise();
       } else {
-        await this.client
-          .emit({ cmd: 'createMailContact' }, createContactDto)
-          .toPromise();
+        this.client.emit({ cmd: 'createMailContact' }, createContactDto);
+        // .toPromise();
       }
       this.logger.log('Evento emitido correctamente.');
     } catch (error) {
