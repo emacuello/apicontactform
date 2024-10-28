@@ -23,6 +23,9 @@ import { envs } from 'src/config/env';
           host: envs.HOST_REDIS,
           port: envs.PORT_REDIS,
           password: envs.PASSWORD_REDIS,
+          tls: {
+            rejectUnauthorized: false,
+          },
         },
       },
     ]),
