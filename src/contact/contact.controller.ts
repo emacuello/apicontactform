@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards, Get } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { Request } from 'express';
@@ -11,7 +11,12 @@ export class ContactController {
 
   @Post()
   @UseGuards(CustomHeaderGuard, ThrottlerGuard)
-  create(@Body() createContactDto: CreateContactDto, @Req() req: Request) {
-    return this.contactService.create(createContactDto, req);
+  async create(@Body() createContactDto: CreateContactDto, @Req() req: Request) {
+    return await this.contactService.create(createContactDto, req);
+  }
+
+  @Get('test')
+  async test() {
+    return await this.contactService.test();
   }
 }

@@ -33,7 +33,7 @@ export class ContactService {
     const newContact = await this.contactRepository.save(contact);
     if (!newContact)
       throw new BadRequestException('Error al crear la solicitud');
-    this.logger.log('Emitiendo evento a Redis...');
+    this.logger.log('Emitiendo evento a RMQ...');
     try {
       if (createContactDto.subject) {
         await this.client
@@ -46,11 +46,22 @@ export class ContactService {
       }
       this.logger.log('Evento emitido correctamente.');
     } catch (error) {
-      this.logger.error('Error al emitir el evento a Redis:', error);
+      this.logger.error('Error al emitir el evento a RMQ:', error);
     }
 
     return {
       message: 'Solicitud creada correctamente',
+    };
+  }
+
+  async test() {
+    try {
+      this.client.emit({ cmd: 'test' }, { subject: 'test', message: 'test', test: 'Mensaje de test' });
+    } catch (error) {
+      this.logger.error('Error al emitir el evento a RMQ:', error);
+    }
+    return {
+      message: 'Test enviado correctamente',
     };
   }
 }

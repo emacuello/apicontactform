@@ -18,13 +18,12 @@ import { envs } from 'src/config/env';
     ClientsModule.register([
       {
         name: 'CONTACT_SERVICE',
-        transport: Transport.REDIS,
+        transport: Transport.RMQ,
         options: {
-          host: envs.HOST_REDIS,
-          port: envs.PORT_REDIS,
-          password: envs.PASSWORD_REDIS,
-          tls: {
-            rejectUnauthorized: false,
+          urls: [envs.HOST_RMQ],
+          queue: envs.QUEUE_RMQ,
+          queueOptions: {
+            durable: true,
           },
         },
       },
