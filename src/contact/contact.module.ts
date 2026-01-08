@@ -6,6 +6,7 @@ import { Contact } from './entities/contact.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { envs } from 'src/config/env';
+import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Contact]),
@@ -28,6 +29,11 @@ import { envs } from 'src/config/env';
         },
       },
     ]),
+    JwtModule.register({
+      global: true,
+      secret: envs.JWT_SECRET,
+      signOptions: { expiresIn: '60s' },
+    }),
   ],
   controllers: [ContactController],
   providers: [ContactService],

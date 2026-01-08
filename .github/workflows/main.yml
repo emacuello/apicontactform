@@ -3,7 +3,7 @@ name: deploy
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
   deploy:
@@ -29,5 +29,5 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           scope: ${{ secrets.VERCEL_ORG_ID }}
           working-directory: ./
-          github-comment: true
-          vercel-args: '--prod'
+          github-comment: false
+          vercel-args: "--prod"

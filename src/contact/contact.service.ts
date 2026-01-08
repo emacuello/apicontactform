@@ -17,6 +17,7 @@ export class ContactService {
   constructor(
     @InjectRepository(Contact) private contactRepository: Repository<Contact>,
     @Inject('CONTACT_SERVICE') private client: ClientProxy,
+    
   ) {}
   async create(createContactDto: CreateContactDto, request: Request) {
     const xForwardedFor = request.headers['x-forwarded-for'];
@@ -54,14 +55,4 @@ export class ContactService {
     };
   }
 
-  async test() {
-    try {
-      this.client.emit({ cmd: 'test' }, { subject: 'test', message: 'test', test: 'Mensaje de test' });
-    } catch (error) {
-      this.logger.error('Error al emitir el evento a RMQ:', error);
-    }
-    return {
-      message: 'Test enviado correctamente',
-    };
-  }
 }

@@ -10,6 +10,9 @@ interface Env {
   DB_URL: string;
   CUSTOM_HEADER_KEY: string;
   CUSTOM_HEADER_VALUE: string;
+  JWT_SECRET: string;
+  CAPTCHA_SECRET: string;
+  CAPTCHA_URL: string;
 }
 const envsSchema = joi
   .object({
@@ -22,6 +25,9 @@ const envsSchema = joi
     QUEUE_RMQ: joi.string().required(),
     CUSTOM_HEADER_KEY: joi.string().required(),
     CUSTOM_HEADER_VALUE: joi.string().required(),
+    JWT_SECRET: joi.string().required(),
+    CAPTCHA_SECRET: joi.string().required(),
+    CAPTCHA_URL: joi.string().required(),
   })
   .unknown(true);
 
