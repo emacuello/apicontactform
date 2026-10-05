@@ -22,11 +22,11 @@ export class JwtGuard implements CanActivate {
       request.headers[CUSTOM_HEADER_KEY?.toLowerCase()] === CUSTOM_HEADER_VALUE
     ) {
       try {
-        const decoded = this.jwt.decode(token);
+        const decoded = this.jwt.verify(token);
         if (decoded?.purpose !== envs.QUEUE_RMQ) {
           throw new ForbiddenException('No puedes acceder a esta ruta 1');
         }
-      } catch (error) {
+      } catch {
         throw new ForbiddenException('No puedes acceder a esta ruta 2');
       }
       console.log('paso la verificacion');

@@ -5,35 +5,36 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { request, Request } from 'express';
+import { Request } from 'express';
 import { envs } from 'src/config/env';
 
 @Injectable()
 export class CaptchaGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-    canActivate(context: ExecutionContext): boolean {
-        const request: Request = context.switchToHttp().getRequest();
-        const captchaToken = request.headers['turnstile-response'];
-        const ip = request.headers['CF-Connecting-IP'] ||
-        request.headers['X-Forwarded-For'] ||
-        'unknown';
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request: Request = context.switchToHttp().getRequest();
+    const captchaToken = request.headers['turnstile-response'];
+    // Express normaliza los nombres de headers a minúsculas
+    const forwardedFor = request.headers['x-forwarded-for'];
+    const ip =
+      request.headers['cf-connecting-ip'] ||
+      (typeof forwardedFor === 'string'
+        ? forwardedFor.split(',')[0].trim()
+        : forwardedFor?.[0]) ||
+      'unknown';
 
-        if (
-            this.verifyCaptcha(captchaToken as string, ip as string).then((res) => {
-                return res;
-            }).catch((err) => {
-                return false;
-            })
-        ) {
-        console.log('paso la verificacion');
-
-        return true;
-        } else {
-        throw new ForbiddenException('No puedes acceder a esta ruta');
-        }
+    if (typeof captchaToken !== 'string' || !captchaToken) {
+      throw new ForbiddenException('No puedes acceder a esta ruta');
     }
-        
+
+    const isValid = await this.verifyCaptcha(captchaToken, ip as string);
+    if (!isValid) {
+      throw new ForbiddenException('No puedes acceder a esta ruta');
+    }
+    return true;
+  }
+
     private async verifyCaptcha(token: string, ip: string): Promise<boolean> {
         const validation = await this.validateTurnstile(token, ip);
 
