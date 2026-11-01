@@ -1,21 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ContactService } from './contact.service';
-import { ContactController } from './contact.controller';
+import { ContactService } from './contact.service.js';
+import { ContactController } from './contact.controller.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Contact } from './entities/contact.entity';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { Contact } from './entities/contact.entity.js';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { envs } from 'src/config/env';
+import { envs } from '../config/env.js';
 import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Contact]),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 5,
-      },
-    ]),
     ClientsModule.register([
       {
         name: 'CONTACT_SERVICE',

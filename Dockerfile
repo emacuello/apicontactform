@@ -1,42 +1,25 @@
 # -----------------------------------------------------------------------------
-# ETAPA 1: Dependencias de Desarrollo
+# ETAPA 1: Base con pnpm (versión fijada por "packageManager" en package.json)
 # -----------------------------------------------------------------------------
-FROM node:24-alpine AS deps
+FROM node:24-alpine AS base
 # libc6-compat suele ser necesario para librerías nativas/C++
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat && corepack enable
 WORKDIR /app
-
-# MEJORA: Copiamos package.json Y package-lock.json para asegurar versiones exactas
-COPY package*.json ./
-
-# MEJORA: Usamos 'npm ci' para una instalación limpia, rápida y determinista basada en el lockfile
-RUN npm ci
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # -----------------------------------------------------------------------------
-# ETAPA 2: Builder
+# ETAPA 2: Builder (todas las dependencias + build)
 # -----------------------------------------------------------------------------
-FROM node:24-alpine AS builder
-WORKDIR /app
-
-# Copiamos node_modules de la etapa anterior (ya cacheados)
-COPY --from=deps /app/node_modules ./node_modules
-
-# Copiamos el código fuente
+FROM base AS builder
+RUN pnpm install --frozen-lockfile
 COPY . .
-
-# Generamos el build de producción
-RUN npm run build
+RUN pnpm build
 
 # -----------------------------------------------------------------------------
 # ETAPA 3: Dependencias de Producción
 # -----------------------------------------------------------------------------
-FROM node:24-alpine AS prod-deps
-WORKDIR /app
-
-COPY package*.json ./
-
-# MEJORA: Instalamos solo dependencias de producción usando 'npm ci'
-RUN npm ci --omit=dev --ignore-scripts
+FROM base AS prod-deps
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 # -----------------------------------------------------------------------------
 # ETAPA 4: Runner
@@ -46,26 +29,19 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# MEJORA: Instalamos 'dumb-init' para manejar correctamente las señales del sistema (SIGTERM)
+# dumb-init para manejar correctamente las señales del sistema (SIGTERM)
 RUN apk add --no-cache dumb-init
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 
-# Copiamos las dependencias limpias de producción
 COPY --from=prod-deps --chown=nestjs:nodejs /app/node_modules ./node_modules
-
-# Copiamos el build generado
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
-
-# Si tu app necesita archivos estáticos o templates, descomenta la siguiente línea:
-# COPY --from=builder --chown=nestjs:nodejs /app/public ./public 
 
 USER nestjs
 
 EXPOSE 3000
 
-# MEJORA: Usamos dumb-init como entrypoint para envolver el proceso de Node
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["node", "dist/main"]

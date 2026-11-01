@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import * as joi from 'joi';
+import joi from 'joi';
 interface Env {
   HOST_REDIS: string;
   PORT_REDIS: number;

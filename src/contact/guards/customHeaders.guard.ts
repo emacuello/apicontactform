@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { envs } from 'src/config/env';
+import { envs } from '../../config/env.js';
 
 @Injectable()
 export class CustomHeaderGuard implements CanActivate {

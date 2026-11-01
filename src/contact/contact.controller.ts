@@ -1,27 +1,27 @@
 import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
-import { ContactService } from './contact.service';
-import { CreateContactDto } from './dto/create-contact.dto';
+import { ContactService } from './contact.service.js';
+import { CreateContactDto } from './dto/create-contact.dto.js';
 import { Request } from 'express';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { CustomHeaderGuard } from './guards/customHeaders.guard';
+import { CustomHeaderGuard } from './guards/customHeaders.guard.js';
 import { JwtService } from '@nestjs/jwt';
-import { JwtGuard } from './guards/jwt.guard';
-import { CaptchaGuard } from './guards/captcha.guard';
-import { envs } from 'src/config/env';
+import { JwtGuard } from './guards/jwt.guard.js';
+import { CaptchaGuard } from './guards/captcha.guard.js';
+import { RateLimitGuard } from './guards/rateLimit.guard.js';
+import { envs } from '../config/env.js';
 
 @Controller('contact')
 export class ContactController {
   constructor(private readonly contactService: ContactService, private readonly jwt: JwtService) {}
 
   @Post()
-  @UseGuards(JwtGuard, ThrottlerGuard, CaptchaGuard)
+  @UseGuards(JwtGuard, RateLimitGuard, CaptchaGuard)
   async create(@Body() createContactDto: CreateContactDto, @Req() req: Request) {
     return await this.contactService.create(createContactDto, req);
   }
   
 
   @Post('form-token')
-  @UseGuards(CustomHeaderGuard, ThrottlerGuard)
+  @UseGuards(CustomHeaderGuard, RateLimitGuard)
   getFormToken() {
     return {
       token: this.jwt.sign(
