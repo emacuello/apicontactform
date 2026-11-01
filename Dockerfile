@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # ETAPA 1: Dependencias de Desarrollo
 # -----------------------------------------------------------------------------
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 # libc6-compat suele ser necesario para librerías nativas/C++
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN npm ci
 # -----------------------------------------------------------------------------
 # ETAPA 2: Builder
 # -----------------------------------------------------------------------------
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 # Copiamos node_modules de la etapa anterior (ya cacheados)
@@ -30,7 +30,7 @@ RUN npm run build
 # -----------------------------------------------------------------------------
 # ETAPA 3: Dependencias de Producción
 # -----------------------------------------------------------------------------
-FROM node:20-alpine AS prod-deps
+FROM node:24-alpine AS prod-deps
 WORKDIR /app
 
 COPY package*.json ./
@@ -41,7 +41,7 @@ RUN npm ci --omit=dev --ignore-scripts
 # -----------------------------------------------------------------------------
 # ETAPA 4: Runner
 # -----------------------------------------------------------------------------
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
