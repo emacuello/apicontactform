@@ -24,7 +24,7 @@ pnpm test:e2e            # test/jest-e2e.json
 
 There is no `.env` in the repo. `src/config/env.ts` loads `dotenv` and validates `process.env` with Joi **at import time**, so anything that imports `envs` throws on load if a variable is missing. That includes tests: `contact.controller.spec.ts` fails with `"HOST_REDIS" is required` when no env is set.
 
-Required: `PORT`, `DB_URL`, `HOST_RMQ`, `QUEUE_RMQ`, `CUSTOM_HEADER_KEY`, `CUSTOM_HEADER_VALUE`, `JWT_SECRET`, `CAPTCHA_SECRET`, `CAPTCHA_URL`, and `HOST_REDIS`/`PORT_REDIS`/`PASSWORD_REDIS`. The Redis variables are required even though no code uses Redis (`ioredis` is installed but never imported).
+Required: `PORT`, `DATABASE_URL` (set by the Neon integration in Vercel), `HOST_RMQ`, `QUEUE_RMQ`, `CUSTOM_HEADER_KEY`, `CUSTOM_HEADER_VALUE`, `JWT_SECRET`, `CAPTCHA_SECRET`, `CAPTCHA_URL`, and `HOST_REDIS`/`PORT_REDIS`/`PASSWORD_REDIS`. The Redis variables are required even though no code uses Redis (`ioredis` is installed but never imported).
 
 ## Architecture
 

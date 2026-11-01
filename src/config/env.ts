@@ -7,7 +7,7 @@ interface Env {
   PORT: number;
   HOST_RMQ: string;
   QUEUE_RMQ: string;
-  DB_URL: string;
+  DATABASE_URL: string;
   CUSTOM_HEADER_KEY: string;
   CUSTOM_HEADER_VALUE: string;
   JWT_SECRET: string;
@@ -20,7 +20,7 @@ const envsSchema = joi
     PORT_REDIS: joi.number().required(),
     PASSWORD_REDIS: joi.string().required(),
     PORT: joi.number().required(),
-    DB_URL: joi.string().required(),
+    DATABASE_URL: joi.string().required(),
     HOST_RMQ: joi.string().required(),
     QUEUE_RMQ: joi.string().required(),
     CUSTOM_HEADER_KEY: joi.string().required(),
