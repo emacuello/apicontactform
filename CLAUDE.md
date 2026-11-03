@@ -24,7 +24,7 @@ pnpm test:e2e            # test/jest-e2e.json
 
 There is no `.env` in the repo. `src/config/env.ts` loads `dotenv` and validates `process.env` with Joi **at import time**, so anything that imports `envs` throws on load if a variable is missing. That includes tests: `contact.controller.spec.ts` fails with `"HOST_REDIS" is required` when no env is set.
 
-Required: `PORT`, `DATABASE_URL` (set by the Neon integration in Vercel), `HOST_RMQ`, `QUEUE_RMQ`, `CUSTOM_HEADER_KEY`, `CUSTOM_HEADER_VALUE`, `JWT_SECRET`, `CAPTCHA_SECRET`, `CAPTCHA_URL`, and `HOST_REDIS`/`PORT_REDIS`/`PASSWORD_REDIS`. The Redis variables are required even though no code uses Redis (`ioredis` is installed but never imported).
+Required: `PORT`, `DATABASE_URL` (Postgres on the VPS), `HOST_RMQ`, `QUEUE_RMQ`, `CUSTOM_HEADER_KEY`, `CUSTOM_HEADER_VALUE`, `JWT_SECRET`, `CAPTCHA_SECRET`, `CAPTCHA_URL`, and `HOST_REDIS`/`PORT_REDIS`/`PASSWORD_REDIS`. The Redis variables are required even though no code uses Redis (`ioredis` is installed but never imported).
 
 ## Architecture
 
@@ -56,4 +56,4 @@ The specs are Nest CLI scaffolding and currently fail:
 
 ## Deployment
 
-A push to `main` runs `.github/workflows/main.yml`: Node 24, `pnpm install --frozen-lockfile`, build, then deploy to Vercel prod (project `contact-form-api`, domain `api-contacto.emacuello.dev`) with `amondnet/vercel-action`. The Vercel project has no Git integration; the action is the only deploy path. `vercel.json` uses the legacy `builds` config with `@vercel/node` on `dist/main.js` and sends all routes to it. The `Dockerfile` is a separate multi-stage build on node:24-alpine with pnpm via corepack (dumb-init, non-root user, port 3000).
+Runs on the VPS (`api-contacto.emacuello.dev`); infra lives in the private repo `emacuello/infra` (`apps/apicontactform/`). A push to `main` runs `.github/workflows/main.yml`, which SSHes into the VPS with a key restricted to `/opt/infra/deploy.sh`. The server then clones `main`, builds the `Dockerfile` (node:24-alpine, pnpm via corepack, dumb-init, non-root, port 3000) and restarts the container. CI does not build or test. The production `.env` exists only on the server, at `/opt/infra/apps/apicontactform/.env`. RabbitMQ is the VPS broker, vhost `contactform`.
